@@ -16,15 +16,16 @@ body{
 font-family:Arial;
 background:#0f0f0f;
 color:white;
-padding:20px;
 margin:0;
+padding:10px;
 }
 
 .container{
-max-width:650px;
+width:100%;
+max-width:700px;
 margin:auto;
 background:#1a1a1a;
-padding:30px;
+padding:20px;
 border-radius:12px;
 box-shadow:0 10px 40px rgba(0,0,0,0.8);
 border:2px solid #ffd000;
@@ -84,18 +85,39 @@ border-radius:8px;
 font-size:18px;
 font-weight:bold;
 cursor:pointer;
-transition:0.2s;
 }
 
 button:hover{
 background:#ffea00;
-transform:scale(1.03);
 }
 
 .loading{
 display:none;
 text-align:center;
 margin-top:10px;
+}
+
+@media (max-width:600px){
+
+.container{
+padding:15px;
+border-radius:8px;
+}
+
+h2{
+font-size:22px;
+}
+
+input,select{
+font-size:16px;
+padding:14px;
+}
+
+button{
+font-size:18px;
+padding:16px;
+}
+
 }
 
 </style>
@@ -115,6 +137,7 @@ margin-top:10px;
 <form id="form">
 
 <label>Marque</label>
+
 <select id="marque">
 
 <option>Volkswagen</option>
@@ -141,6 +164,7 @@ margin-top:10px;
 <input id="matricule">
 
 <label>Toit ouvrant</label>
+
 <select id="toit">
 
 <option>avec toit ouvrant</option>
