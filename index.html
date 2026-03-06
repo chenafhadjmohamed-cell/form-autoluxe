@@ -109,7 +109,7 @@ color:white !important;
 <select id="modele"></select>
 
 <label>Année</label>
-<input type="number" id="annee">
+<select id="annee"></select>
 
 <label>Matricule</label>
 <input id="matricule">
@@ -124,10 +124,10 @@ color:white !important;
 
 <select id="service">
 
-<option value="ciel">Rénovation ciel de toit</option>
-<option value="rideau">Remplacement rideau toit ouvrant</option>
-<option value="couleur">Changement couleur tissu</option>
-<option value="alcantara">Alcantara</option>
+<option value="prix_ciel">Rénovation ciel de toit</option>
+<option value="prix_rideau">Remplacement rideau toit ouvrant</option>
+<option value="prix_couleur">Changement couleur tissu</option>
+<option value="prix_alcantara">Alcantara</option>
 
 </select>
 
@@ -162,6 +162,8 @@ color:white !important;
 const sheetURL="https://docs.google.com/spreadsheets/d/1T7AJBCvfomGbjdrm3ydughenuqPdKpYHmmW4DD_sz2M/gviz/tq?tqx=out:csv&gid=0"
 
 let database=[]
+let marqueSelect
+let modeleSelect
 
 function clean(v){
 return v.replace(/"/g,"").trim()
@@ -192,6 +194,8 @@ prix_alcantara:clean(c[9])
 })
 
 initBrands()
+initYears()
+initTomSelect()
 
 }
 
@@ -202,13 +206,35 @@ const marques=[...new Set(database.map(d=>d.marque))]
 const select=document.getElementById("marque")
 
 marques.forEach(m=>{
-
 const opt=document.createElement("option")
 opt.value=m
 opt.textContent=m
 select.appendChild(opt)
-
 })
+
+}
+
+function initYears(){
+
+const select=document.getElementById("annee")
+
+for(let y=1970;y<=2030;y++){
+
+const opt=document.createElement("option")
+
+opt.value=y
+opt.textContent=y
+
+select.appendChild(opt)
+
+}
+
+}
+
+function initTomSelect(){
+
+marqueSelect = new TomSelect("#marque",{create:true})
+modeleSelect = new TomSelect("#modele",{create:true})
 
 }
 
@@ -218,40 +244,39 @@ const marque=this.value
 
 const models=database.filter(d=>d.marque===marque)
 
-const select=document.getElementById("modele")
-
-select.innerHTML=""
+modeleSelect.clearOptions()
 
 models.forEach(m=>{
+modeleSelect.addOption({
+value:m.modele,
+text:m.modele
+})
+})
 
-const opt=document.createElement("option")
-opt.value=m.modele
-opt.textContent=m.modele
-select.appendChild(opt)
+modeleSelect.refreshOptions(false)
 
 })
 
-})
+document.getElementById("service").addEventListener("change",updatePrice)
+document.getElementById("modele").addEventListener("change",updatePrice)
 
-document.getElementById("service").addEventListener("change",function(){
+function updatePrice(){
 
 const marque=document.getElementById("marque").value
 const modele=document.getElementById("modele").value
+const service=document.getElementById("service").value
 
 const car=database.find(d=>d.marque===marque && d.modele===modele)
 
 if(!car) return
 
-let prix=""
+const prix=car[service]
 
-if(this.value==="ciel") prix=car.prix_ciel
-if(this.value==="rideau") prix=car.prix_rideau
-if(this.value==="couleur") prix=car.prix_couleur
-if(this.value==="alcantara") prix=car.prix_alcantara
-
+if(prix){
 document.getElementById("prix").value=prix
+}
 
-})
+}
 
 document.getElementById("form").addEventListener("submit",async function(e){
 
@@ -277,11 +302,7 @@ heure:document.getElementById("heure").value
 await fetch("https://n8n-hetzner.duckdns.org/webhook/nouveau-client",{
 
 method:"POST",
-
-headers:{
-"Content-Type":"application/json"
-},
-
+headers:{ "Content-Type":"application/json" },
 body:JSON.stringify(data)
 
 })
@@ -290,13 +311,9 @@ alert("Client ajouté")
 
 })
 
-new TomSelect("#marque",{create:true})
-new TomSelect("#modele",{create:true})
-
 loadData()
 
 </script>
 
 </body>
-
 </html>
