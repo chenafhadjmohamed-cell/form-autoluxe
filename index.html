@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-
 <html>
 
 <head>
 
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Auto Luxe Atelier</title>
 
 <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
@@ -15,14 +16,15 @@ body{
 font-family:Arial;
 background:#0f0f0f;
 color:white;
-padding:40px;
+padding:20px;
+margin:0;
 }
 
 .container{
 max-width:650px;
 margin:auto;
 background:#1a1a1a;
-padding:40px;
+padding:30px;
 border-radius:12px;
 box-shadow:0 10px 40px rgba(0,0,0,0.8);
 border:2px solid #ffd000;
@@ -34,14 +36,15 @@ margin-bottom:20px;
 }
 
 .logo img{
-max-width:200px;
+max-width:180px;
+width:100%;
 }
 
 h2{
 text-align:center;
 color:#ffd000;
 margin-bottom:25px;
-font-size:28px;
+font-size:26px;
 letter-spacing:2px;
 text-transform:uppercase;
 }
@@ -49,17 +52,20 @@ text-transform:uppercase;
 label{
 font-weight:bold;
 color:#ffd000;
+display:block;
+margin-top:10px;
 }
 
 input,select{
 width:100%;
-padding:12px;
+padding:14px;
 margin-top:8px;
-margin-bottom:20px;
+margin-bottom:18px;
 border-radius:6px;
 border:1px solid #444;
 background:#111;
 color:white;
+font-size:16px;
 }
 
 input:focus,select:focus{
@@ -71,11 +77,11 @@ box-shadow:0 0 6px #ffd000;
 button{
 background:#ffd000;
 color:black;
-padding:14px;
+padding:16px;
 border:none;
 width:100%;
-border-radius:6px;
-font-size:16px;
+border-radius:8px;
+font-size:18px;
 font-weight:bold;
 cursor:pointer;
 transition:0.2s;
@@ -84,6 +90,12 @@ transition:0.2s;
 button:hover{
 background:#ffea00;
 transform:scale(1.03);
+}
+
+.loading{
+display:none;
+text-align:center;
+margin-top:10px;
 }
 
 </style>
@@ -102,7 +114,8 @@ transform:scale(1.03);
 
 <form id="form">
 
-<label>Marque</label> <select id="marque">
+<label>Marque</label>
+<select id="marque">
 
 <option>Volkswagen</option>
 <option>Renault</option>
@@ -118,13 +131,17 @@ transform:scale(1.03);
 
 </select>
 
-<label>Modèle</label> <input id="modele">
+<label>Modèle</label>
+<input id="modele">
 
-<label>Année</label> <input type="number" id="annee">
+<label>Année</label>
+<input type="number" id="annee">
 
-<label>Matricule</label> <input id="matricule">
+<label>Matricule</label>
+<input id="matricule">
 
-<label>Toit ouvrant</label> <select id="toit">
+<label>Toit ouvrant</label>
+<select id="toit">
 
 <option>avec toit ouvrant</option>
 <option>sans toit ouvrant</option>
@@ -144,19 +161,29 @@ transform:scale(1.03);
 
 </select>
 
-<label>Prénom</label> <input id="prenom">
+<label>Prénom</label>
+<input id="prenom">
 
-<label>Nom</label> <input id="nom">
+<label>Nom</label>
+<input id="nom">
 
-<label>Téléphone</label> <input id="tel">
+<label>Téléphone</label>
+<input id="tel" type="tel">
 
-<label>Date rendez-vous</label> <input type="date" id="date">
+<label>Date rendez-vous</label>
+<input type="date" id="date">
 
-<label>Heure</label> <input id="heure">
+<label>Heure</label>
+<input type="time" id="heure">
 
-<label>Prix</label> <input type="number" id="prix">
+<label>Prix</label>
+<input type="number" id="prix">
 
 <button type="submit">Ajouter client</button>
+
+<div class="loading" id="loading">
+Envoi en cours...
+</div>
 
 </form>
 
@@ -173,6 +200,10 @@ document.getElementById("form").addEventListener("submit",async function(e){
 
 e.preventDefault()
 
+document.getElementById("loading").style.display="block"
+
+const services = [...document.getElementById("service").selectedOptions].map(o=>o.value)
+
 const data = {
 
 marque:document.getElementById("marque").value,
@@ -180,7 +211,7 @@ modele:document.getElementById("modele").value,
 annee:document.getElementById("annee").value,
 matricule:document.getElementById("matricule").value,
 toit:document.getElementById("toit").value,
-service:document.getElementById("service").value,
+service:services,
 prenom:document.getElementById("prenom").value,
 nom:document.getElementById("nom").value,
 telephone:document.getElementById("tel").value,
@@ -202,7 +233,11 @@ body:JSON.stringify(data)
 
 })
 
+document.getElementById("loading").style.display="none"
+
 alert("Client ajouté avec succès")
+
+document.getElementById("form").reset()
 
 })
 
