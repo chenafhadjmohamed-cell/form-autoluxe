@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html>
 
 <head>
@@ -29,38 +30,26 @@ border-radius:12px;
 border:2px solid #ffd000;
 }
 
-.logo{
-text-align:center;
-margin-bottom:20px;
-}
-
-.logo img{
-max-width:180px;
-}
-
 h2{
 text-align:center;
 color:#ffd000;
-margin-bottom:25px;
-font-size:26px;
-letter-spacing:2px;
 }
 
 label{
 font-weight:bold;
 color:#ffd000;
+display:block;
+margin-top:15px;
 }
 
-input,select{
+input,select,textarea{
 width:100%;
 padding:12px;
-margin-top:8px;
-margin-bottom:20px;
+margin-top:6px;
 border-radius:6px;
 border:1px solid #444;
 background:#111;
 color:white;
-font-size:16px;
 }
 
 button{
@@ -72,18 +61,74 @@ width:100%;
 border-radius:6px;
 font-size:16px;
 font-weight:bold;
+margin-top:20px;
 cursor:pointer;
 }
 
+/* TomSelect correction couleur */
+
 .ts-control{
 background:#111 !important;
-border:1px solid #444 !important;
 color:white !important;
+border:1px solid #444 !important;
 }
 
 .ts-dropdown{
 background:#111 !important;
 color:white !important;
+}
+
+/* Boutons radio design */
+
+.radio-group{
+display:flex;
+gap:10px;
+margin-top:10px;
+}
+
+.radio-card{
+flex:1;
+border:1px solid #444;
+padding:12px;
+border-radius:6px;
+text-align:center;
+cursor:pointer;
+}
+
+.radio-card input{
+display:none;
+}
+
+.radio-card.active{
+background:#ffd000;
+color:black;
+font-weight:bold;
+}
+
+/* Services design */
+
+.services{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin-top:10px;
+}
+
+.service-card{
+border:1px solid #444;
+padding:12px;
+border-radius:6px;
+cursor:pointer;
+}
+
+.service-card input{
+display:none;
+}
+
+.service-card.active{
+background:#ffd000;
+color:black;
+font-weight:bold;
 }
 
 </style>
@@ -94,60 +139,81 @@ color:white !important;
 
 <div class="container">
 
-<div class="logo">
-<img src="logo-autoluxe.png">
-</div>
-
 <h2>Nouveau client</h2>
 
 <form id="form">
 
-<label>Marque</label>
-<select id="marque"></select>
+<label>Marque *</label> <select id="marque"></select>
 
-<label>Modèle</label>
-<select id="modele"></select>
+<label>Modèle *</label> <select id="modele"></select>
 
-<label>Année</label>
-<select id="annee"></select>
+<label>Année *</label> <select id="annee"></select>
 
-<label>Matricule</label>
-<input id="matricule">
+<label>Matricule</label> <input id="matricule">
 
 <label>Toit ouvrant</label>
-<select id="toit">
-<option>avec</option>
-<option>sans</option>
-</select>
 
-<label>Service</label>
+<div class="radio-group">
 
-<select id="service">
+<label class="radio-card">
+<input type="radio" name="toit" value="avec">
+avec toit ouvrant
+</label>
 
-<option value="prix_ciel">Rénovation ciel de toit</option>
-<option value="prix_rideau">Remplacement rideau toit ouvrant</option>
-<option value="prix_couleur">Changement couleur tissu</option>
-<option value="prix_alcantara">Alcantara</option>
+<label class="radio-card">
+<input type="radio" name="toit" value="sans">
+sans toit ouvrant
+</label>
 
-</select>
+</div>
 
-<label>Prix</label>
-<input id="prix">
+<label>Services</label>
 
-<label>Prénom</label>
-<input id="prenom">
+<div class="services">
 
-<label>Nom</label>
-<input id="nom">
+<label class="service-card">
+<input type="checkbox" value="ciel">
+Rénovation ciel de toit
+</label>
 
-<label>Téléphone</label>
-<input id="tel">
+<label class="service-card">
+<input type="checkbox" value="rideau">
+Rideau toit ouvrant
+</label>
 
-<label>Date rendez-vous</label>
-<input type="date" id="date">
+<label class="service-card">
+<input type="checkbox" value="couleur">
+Changement couleur
+</label>
 
-<label>Heure</label>
-<input id="heure">
+<label class="service-card">
+<input type="checkbox" value="alcantara">
+Alcantara
+</label>
+
+<label class="service-card">
+<input type="checkbox" value="portes">
+Tissu portes
+</label>
+
+<label class="service-card">
+<input type="checkbox" value="etoile">
+Ciel étoilé
+</label>
+
+</div>
+
+<label>Remarques</label>
+
+<textarea id="remarques"></textarea>
+
+<label>Prénom</label> <input id="prenom">
+
+<label>Nom</label> <input id="nom">
+
+<label>Téléphone</label> <input id="tel">
+
+<label>Prix</label> <input id="prix">
 
 <button type="submit">Ajouter client</button>
 
@@ -162,12 +228,7 @@ color:white !important;
 const sheetURL="https://docs.google.com/spreadsheets/d/1T7AJBCvfomGbjdrm3ydughenuqPdKpYHmmW4DD_sz2M/gviz/tq?tqx=out:csv&gid=0"
 
 let database=[]
-let marqueSelect
 let modeleSelect
-
-function clean(v){
-return v.replace(/"/g,"").trim()
-}
 
 async function loadData(){
 
@@ -182,12 +243,9 @@ const c=r.split(",")
 
 database.push({
 
-marque:clean(c[0]),
-modele:clean(c[1]),
-prix_ciel:clean(c[5]),
-prix_rideau:clean(c[7]),
-prix_couleur:clean(c[8]),
-prix_alcantara:clean(c[9])
+marque:c[0],
+modele:c[1],
+prix:c[5]
 
 })
 
@@ -195,7 +253,9 @@ prix_alcantara:clean(c[9])
 
 initBrands()
 initYears()
-initTomSelect()
+
+new TomSelect("#marque",{create:true})
+modeleSelect=new TomSelect("#modele",{create:true})
 
 }
 
@@ -203,20 +263,19 @@ function initBrands(){
 
 const marques=[...new Set(database.map(d=>d.marque))]
 
-const select=document.getElementById("marque")
-
 marques.forEach(m=>{
+
 const opt=document.createElement("option")
 opt.value=m
 opt.textContent=m
-select.appendChild(opt)
+
+marque.appendChild(opt)
+
 })
 
 }
 
 function initYears(){
-
-const select=document.getElementById("annee")
 
 for(let y=1970;y<=2030;y++){
 
@@ -225,90 +284,46 @@ const opt=document.createElement("option")
 opt.value=y
 opt.textContent=y
 
-select.appendChild(opt)
+annee.appendChild(opt)
 
 }
 
 }
 
-function initTomSelect(){
+marque.addEventListener("change",function(){
 
-marqueSelect = new TomSelect("#marque",{create:true})
-modeleSelect = new TomSelect("#modele",{create:true})
-
-}
-
-document.getElementById("marque").addEventListener("change",function(){
-
-const marque=this.value
-
-const models=database.filter(d=>d.marque===marque)
+const models=database.filter(d=>d.marque===this.value)
 
 modeleSelect.clearOptions()
 
 models.forEach(m=>{
+
 modeleSelect.addOption({
 value:m.modele,
 text:m.modele
 })
+
 })
 
 modeleSelect.refreshOptions(false)
 
 })
 
-document.getElementById("service").addEventListener("change",updatePrice)
-document.getElementById("modele").addEventListener("change",updatePrice)
+/* activation design */
 
-function updatePrice(){
-
-const marque=document.getElementById("marque").value
-const modele=document.getElementById("modele").value
-const service=document.getElementById("service").value
-
-const car=database.find(d=>d.marque===marque && d.modele===modele)
-
-if(!car) return
-
-const prix=car[service]
-
-if(prix){
-document.getElementById("prix").value=prix
+document.querySelectorAll(".radio-card").forEach(card=>{
+card.onclick=()=>{
+document.querySelectorAll(".radio-card").forEach(c=>c.classList.remove("active"))
+card.classList.add("active")
+card.querySelector("input").checked=true
 }
-
-}
-
-document.getElementById("form").addEventListener("submit",async function(e){
-
-e.preventDefault()
-
-const data={
-
-marque:document.getElementById("marque").value,
-modele:document.getElementById("modele").value,
-annee:document.getElementById("annee").value,
-matricule:document.getElementById("matricule").value,
-toit:document.getElementById("toit").value,
-service:document.getElementById("service").value,
-prix:document.getElementById("prix").value,
-prenom:document.getElementById("prenom").value,
-nom:document.getElementById("nom").value,
-telephone:document.getElementById("tel").value,
-date:document.getElementById("date").value,
-heure:document.getElementById("heure").value
-
-}
-
-await fetch("https://n8n-hetzner.duckdns.org/webhook/nouveau-client",{
-
-method:"POST",
-headers:{ "Content-Type":"application/json" },
-body:JSON.stringify(data)
-
 })
 
-alert("Client ajouté")
-
+document.querySelectorAll(".service-card").forEach(card=>{
+card.onclick=()=>{
+card.classList.toggle("active")
+card.querySelector("input").checked=!card.querySelector("input").checked
+}
 })
 
 loadData()
