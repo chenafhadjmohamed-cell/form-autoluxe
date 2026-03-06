@@ -52,20 +52,7 @@ background:#111;
 color:white;
 }
 
-button{
-background:#ffd000;
-color:black;
-padding:14px;
-border:none;
-width:100%;
-border-radius:6px;
-font-size:16px;
-font-weight:bold;
-margin-top:20px;
-cursor:pointer;
-}
-
-/* correction couleur tomselect */
+/* TOM SELECT */
 
 .ts-control{
 background:#111 !important;
@@ -78,7 +65,36 @@ background:#111 !important;
 color:white !important;
 }
 
-/* SERVICES STYLE */
+/* TOIT OUVRANT */
+
+.toit-group{
+display:flex;
+gap:10px;
+margin-top:10px;
+}
+
+.toit-option{
+
+flex:1;
+border:1px solid #444;
+padding:12px;
+border-radius:6px;
+text-align:center;
+cursor:pointer;
+
+}
+
+.toit-option input{
+display:none;
+}
+
+.toit-option.active{
+background:#ffd000;
+color:black;
+font-weight:bold;
+}
+
+/* SERVICES */
 
 .services{
 margin-top:10px;
@@ -96,7 +112,7 @@ border-radius:6px;
 margin-bottom:8px;
 
 cursor:pointer;
-transition:0.2s;
+
 }
 
 .service-row:hover{
@@ -119,8 +135,21 @@ border-radius:3px;
 }
 
 .service-row.active .service-box{
+background:#ffd000;
+}
+
+button{
 
 background:#ffd000;
+color:black;
+padding:14px;
+border:none;
+width:100%;
+border-radius:6px;
+font-size:16px;
+font-weight:bold;
+margin-top:20px;
+cursor:pointer;
 
 }
 
@@ -143,6 +172,28 @@ background:#ffd000;
 <label>Année</label> <select id="annee"></select>
 
 <label>Matricule</label> <input id="matricule">
+
+<label>Toit ouvrant</label>
+
+<div class="toit-group">
+
+<label class="toit-option">
+
+<input type="radio" name="toit" value="avec">
+
+avec toit ouvrant
+
+</label>
+
+<label class="toit-option">
+
+<input type="radio" name="toit" value="sans">
+
+sans toit ouvrant
+
+</label>
+
+</div>
 
 <label>Services</label>
 
@@ -204,7 +255,114 @@ Ciel étoilé
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+
 <script>
+
+const sheetURL="https://docs.google.com/spreadsheets/d/1T7AJBCvfomGbjdrm3ydughenuqPdKpYHmmW4DD_sz2M/gviz/tq?tqx=out:csv&gid=0"
+
+let database=[]
+let modeleSelect
+
+function clean(v){
+return v.replace(/"/g,"").trim()
+}
+
+async function loadData(){
+
+const res=await fetch(sheetURL)
+const text=await res.text()
+
+const rows=text.split("\n").slice(1)
+
+rows.forEach(r=>{
+
+const c=r.split(",")
+
+database.push({
+
+marque:clean(c[0]),
+modele:clean(c[1])
+
+})
+
+})
+
+initBrands()
+initYears()
+
+new TomSelect("#marque",{create:true})
+modeleSelect=new TomSelect("#modele",{create:true})
+
+}
+
+function initBrands(){
+
+const marques=[...new Set(database.map(d=>d.marque))]
+
+marques.forEach(m=>{
+
+const opt=document.createElement("option")
+opt.value=m
+opt.textContent=m
+
+marque.appendChild(opt)
+
+})
+
+}
+
+function initYears(){
+
+for(let y=1970;y<=2030;y++){
+
+const opt=document.createElement("option")
+
+opt.value=y
+opt.textContent=y
+
+annee.appendChild(opt)
+
+}
+
+}
+
+marque.addEventListener("change",function(){
+
+const models=database.filter(d=>d.marque===this.value)
+
+modeleSelect.clearOptions()
+
+models.forEach(m=>{
+
+modeleSelect.addOption({
+value:m.modele,
+text:m.modele
+})
+
+})
+
+modeleSelect.refreshOptions(false)
+
+})
+
+/* TOIT */
+
+document.querySelectorAll(".toit-option").forEach(card=>{
+
+card.onclick=()=>{
+
+document.querySelectorAll(".toit-option").forEach(c=>c.classList.remove("active"))
+
+card.classList.add("active")
+
+card.querySelector("input").checked=true
+
+}
+
+})
+
+/* SERVICES */
 
 document.querySelectorAll(".service-row").forEach(row=>{
 
@@ -219,6 +377,8 @@ checkbox.checked=!checkbox.checked
 }
 
 })
+
+loadData()
 
 </script>
 
