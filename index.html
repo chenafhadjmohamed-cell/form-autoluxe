@@ -52,7 +52,7 @@ background:#111;
 color:white;
 }
 
-/* TOM SELECT */
+/* TOMSELECT */
 
 .ts-control{
 background:#111 !important;
@@ -65,7 +65,7 @@ background:#111 !important;
 color:white !important;
 }
 
-/* TOIT OUVRANT */
+/* TOIT */
 
 .toit-group{
 display:flex;
@@ -74,14 +74,12 @@ margin-top:10px;
 }
 
 .toit-option{
-
 flex:1;
 border:1px solid #444;
 padding:12px;
 border-radius:6px;
 text-align:center;
 cursor:pointer;
-
 }
 
 .toit-option input{
@@ -124,14 +122,10 @@ display:none;
 }
 
 .service-box{
-
 width:18px;
 height:18px;
-
 border:2px solid #ffd000;
-
 border-radius:3px;
-
 }
 
 .service-row.active .service-box{
@@ -139,7 +133,6 @@ background:#ffd000;
 }
 
 button{
-
 background:#ffd000;
 color:black;
 padding:14px;
@@ -150,7 +143,6 @@ font-size:16px;
 font-weight:bold;
 margin-top:20px;
 cursor:pointer;
-
 }
 
 </style>
@@ -178,19 +170,13 @@ cursor:pointer;
 <div class="toit-group">
 
 <label class="toit-option">
-
 <input type="radio" name="toit" value="avec">
-
 avec toit ouvrant
-
 </label>
 
 <label class="toit-option">
-
 <input type="radio" name="toit" value="sans">
-
 sans toit ouvrant
-
 </label>
 
 </div>
@@ -199,40 +185,24 @@ sans toit ouvrant
 
 <div class="services">
 
-<div class="service-row">
+<div class="service-row" data-service="ciel">
 <div class="service-box"></div>
-<input type="checkbox" value="Rénovation ciel de toit">
 Rénovation ciel de toit
 </div>
 
-<div class="service-row">
+<div class="service-row" data-service="rideau">
 <div class="service-box"></div>
-<input type="checkbox" value="Rideau toit ouvrant">
 Rideau toit ouvrant
 </div>
 
-<div class="service-row">
+<div class="service-row" data-service="couleur">
 <div class="service-box"></div>
-<input type="checkbox" value="Changement couleur">
 Changement couleur ciel de toit
 </div>
 
-<div class="service-row">
+<div class="service-row" data-service="alcantara">
 <div class="service-box"></div>
-<input type="checkbox" value="Alcantara">
 Alcantara
-</div>
-
-<div class="service-row">
-<div class="service-box"></div>
-<input type="checkbox" value="Tissu portes">
-Rénovation tissu portes
-</div>
-
-<div class="service-row">
-<div class="service-box"></div>
-<input type="checkbox" value="Ciel étoilé">
-Ciel étoilé
 </div>
 
 </div>
@@ -257,14 +227,13 @@ Ciel étoilé
 
 <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
-
 <script>
 
 const sheetURL="https://docs.google.com/spreadsheets/d/1T7AJBCvfomGbjdrm3ydughenuqPdKpYHmmW4DD_sz2M/gviz/tq?tqx=out:csv&gid=0"
 
 let database=[]
 let modeleSelect
+let servicesSelectionnes=[]
 
 function clean(v){
 return v.replace(/"/g,"").trim()
@@ -369,7 +338,7 @@ card.querySelector("input").checked=true
 
 })
 
-/* SERVICES + CALCUL PRIX */
+/* SERVICES */
 
 document.querySelectorAll(".service-row").forEach(row=>{
 
@@ -377,8 +346,17 @@ row.onclick=()=>{
 
 row.classList.toggle("active")
 
-const checkbox=row.querySelector("input")
-checkbox.checked=!checkbox.checked
+const service=row.dataset.service
+
+if(servicesSelectionnes.includes(service)){
+
+servicesSelectionnes=servicesSelectionnes.filter(s=>s!==service)
+
+}else{
+
+servicesSelectionnes.push(service)
+
+}
 
 calculPrix()
 
@@ -397,14 +375,12 @@ if(!voiture)return
 
 let total=0
 
-document.querySelectorAll(".service-row input:checked").forEach(service=>{
+servicesSelectionnes.forEach(s=>{
 
-const val=service.value
-
-if(val==="Rénovation ciel de toit") total+=voiture.prix_ciel
-if(val==="Rideau toit ouvrant") total+=voiture.prix_rideau
-if(val==="Changement couleur") total+=voiture.prix_couleur
-if(val==="Alcantara") total+=voiture.prix_alcantara
+if(s==="ciel") total+=voiture.prix_ciel
+if(s==="rideau") total+=voiture.prix_rideau
+if(s==="couleur") total+=voiture.prix_couleur
+if(s==="alcantara") total+=voiture.prix_alcantara
 
 })
 
@@ -416,106 +392,6 @@ loadData()
 
 </script>
 
-
-})
-
-})
-
-initBrands()
-initYears()
-
-new TomSelect("#marque",{create:true})
-modeleSelect=new TomSelect("#modele",{create:true})
-
-}
-
-function initBrands(){
-
-const marques=[...new Set(database.map(d=>d.marque))]
-
-marques.forEach(m=>{
-
-const opt=document.createElement("option")
-opt.value=m
-opt.textContent=m
-
-marque.appendChild(opt)
-
-})
-
-}
-
-function initYears(){
-
-for(let y=1970;y<=2030;y++){
-
-const opt=document.createElement("option")
-
-opt.value=y
-opt.textContent=y
-
-annee.appendChild(opt)
-
-}
-
-}
-
-marque.addEventListener("change",function(){
-
-const models=database.filter(d=>d.marque===this.value)
-
-modeleSelect.clearOptions()
-
-models.forEach(m=>{
-
-modeleSelect.addOption({
-value:m.modele,
-text:m.modele
-})
-
-})
-
-modeleSelect.refreshOptions(false)
-
-})
-
-/* TOIT */
-
-document.querySelectorAll(".toit-option").forEach(card=>{
-
-card.onclick=()=>{
-
-document.querySelectorAll(".toit-option").forEach(c=>c.classList.remove("active"))
-
-card.classList.add("active")
-
-card.querySelector("input").checked=true
-
-}
-
-})
-
-/* SERVICES */
-
-document.querySelectorAll(".service-row").forEach(row=>{
-
-row.onclick=()=>{
-
-row.classList.toggle("active")
-
-const checkbox=row.querySelector("input")
-
-checkbox.checked=!checkbox.checked
-
-}
-
-})
-
-loadData()
-
-</script>
-
 </body>
 
 </html>
-
