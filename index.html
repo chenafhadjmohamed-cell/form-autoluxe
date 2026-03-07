@@ -241,6 +241,7 @@ const sheetURL="https://docs.google.com/spreadsheets/d/1T7AJBCvfomGbjdrm3ydughen
 
 let database=[]
 let modeleSelect
+let anneeSelect
 let servicesSelectionnes=[]
 
 function clean(v){
@@ -278,7 +279,10 @@ prix_alcantara:parseInt(clean(c[9]))||0
 initBrands()
 
 new TomSelect("#marque",{create:true})
-modeleSelect=new TomSelect("#modele",{create:true})
+
+modeleSelect = new TomSelect("#modele",{create:true})
+
+anneeSelect = new TomSelect("#annee",{create:true})
 
 }
 
@@ -329,7 +333,7 @@ if(!voiture)return
 
 const selectAnnee=document.getElementById("annee")
 
-selectAnnee.innerHTML=""
+anneeSelect.clearOptions()
 
 for(let y=voiture.annee_debut;y<=voiture.annee_fin;y++){
 
@@ -338,9 +342,14 @@ const opt=document.createElement("option")
 opt.value=y
 opt.textContent=y
 
-selectAnnee.appendChild(opt)
+anneeSelect.addOption({
+value:y,
+text:y
+})
 
 }
+
+anneeSelect.refreshOptions(false)
 
 })
 
@@ -417,6 +426,7 @@ loadData()
 </body>
 
 </html>
+
 
 
 
