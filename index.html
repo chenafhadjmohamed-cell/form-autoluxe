@@ -401,27 +401,28 @@ modele.addEventListener("change",function(){
 const marque=document.getElementById("marque").value
 const modele=this.value
 
-const voiture=database.find(v=>v.marque===marque && v.modele===modele)
-
-if(!voiture)return
-
-const selectAnnee=document.getElementById("annee")
+const voitures = database.filter(v=>v.marque===marque && v.modele===modele)
 
 anneeSelect.clearOptions()
 
-for(let y=voiture.annee_debut;y<=voiture.annee_fin;y++){
+let years = []
 
-const opt=document.createElement("option")
+voitures.forEach(v=>{
 
-opt.value=y
-opt.textContent=y
+for(let y=v.annee_debut;y<=v.annee_fin;y++){
+years.push(y)
+}
 
+})
+
+years = [...new Set(years)].sort((a,b)=>a-b)
+
+years.forEach(y=>{
 anneeSelect.addOption({
 value:y,
 text:y
 })
-
-}
+})
 
 anneeSelect.refreshOptions(false)
 
@@ -474,7 +475,14 @@ function calculPrix(){
 const marque=document.getElementById("marque").value
 const modele=document.getElementById("modele").value
 
-const voiture=database.find(v=>v.marque===marque && v.modele===modele)
+const annee = parseInt(document.getElementById("annee").value)
+
+const voiture = database.find(v =>
+v.marque===marque &&
+v.modele===modele &&
+annee>=v.annee_debut &&
+annee<=v.annee_fin
+)
 
 if(!voiture)return
 
@@ -567,6 +575,7 @@ alert("Client ajouté avec succès")
 </body>
 
 </html>
+
 
 
 
